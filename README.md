@@ -1,6 +1,6 @@
 ### **Batch Log Manager**
 
-Processes CSV files uploaded to S3 bucket to Sqlite using Lambda.
+Processes Batch log CSV files uploaded to S3 bucket to Sqlite using Lambda.
 
 
 To deploy **Batch Log Manager**, please follow the following steps :
