@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Deploys S3 Bucket, Integrates Lambda and Configures required policies and roles
+Parameters:
+  BucketName:
+    Description: S3 bucket name where batch logs are uploaded
+    Type: String
+    Default: batch-logs-2021
+  BatchLogManagerLambdaName:
+    Description: defines batch log manage lambda's name
+    Type: String
+    Default: BatchLogManager
+Resources:
+  BatchLogsBucket:
+    Type: AWS::S3::Bucket
+    DependsOn: BucketPermission
+    Properties:
+      BucketName: !Ref BucketName
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: 's3:ObjectCreated:*'
+            Function: !GetAtt BatchLogManager.Arn
+  BucketPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn: BatchLogManager
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !Ref BatchLogManagerLambdaName
+      Principal: s3.amazonaws.com
+      SourceAccount: !Ref "AWS::AccountId"
+      SourceArn: !Sub "arn:aws:s3:::${BucketName}"
+  BatchLogManager:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Ref BatchLogManagerLambdaName
+      Description: Processes Batch Logs when invoked v1.0.0
+      Handler: handler.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      Runtime: python3.9
+      Code:
+        S3Bucket: lambda-zips-2021
+        S3Key: BatchLogManager
+        S3ObjectVersion: XcQ0Me9ssMcleenIDfygbeP4ZF8pauxL
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal: {Service: [lambda.amazonaws.com]}
+            Action: ['sts:AssumeRole']
+      Path: /
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      Policies:
+        - PolicyName: batch_log_manager_logs
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "arn:aws:logs:*:*:*"
