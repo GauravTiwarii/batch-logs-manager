@@ -40,7 +40,7 @@ Resources:
       Code:
         S3Bucket: lambda-zips-2021
         S3Key: BatchLogManager
-        S3ObjectVersion: XcQ0Me9ssMcleenIDfygbeP4ZF8pauxL
+        S3ObjectVersion: qr4yQceBIasvjhMuGI1hXelUjRJklcS3
 
   LambdaExecutionRole:
     Type: AWS::IAM::Role
@@ -63,3 +63,10 @@ Resources:
                   - "logs:CreateLogStream"
                   - "logs:PutLogEvents"
                 Resource: "arn:aws:logs:*:*:*"
+        - PolicyName: s3_read_access
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                Resource: !Sub "arn:aws:s3:::${BucketName}/*"
