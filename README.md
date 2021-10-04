@@ -10,7 +10,7 @@ To deploy **Batch Log Manager**, please follow the following steps :
 
 Navigate to lambda folder, where handler.py is present:
 
-2. tar -caf ../../infra/lambda_zips/BatchLogManager.zip .
+2. `tar -caf ../../infra/lambda_zips/BatchLogManager.zip .`
 
 Navigate back to "batch-log-manager"
 
@@ -24,8 +24,15 @@ To deploy/update Stack, use the following command:
 
 _Note: Logs will be available under LogGroup "/aws/lambda/BatchLogManager" on CloudWatch_
 
-[Please use "main" branch for working executables, if TODOs are not completed]
-TODO:
+To run tests, use the following command:
+
+1. `python3 -m pip install requirements/dev.txt`
+2. `python3 -m pytest /tests -v`
+
+
+[Please use "main" branch for working executables, if TODOs are not completed, time constraints were applicable]
+
+###### TODO:
  1. Integration of sqlite [Did we need it in-memory on lambda ? as even if we store it on "/tmp", that only gives us a valid scenario for read-only requirements and we have write as feature requirement here]
  2. Addition of more tests.
 
