@@ -1,5 +1,6 @@
 import csv
 import boto3
+from datetime import datetime
 
 TOTAL_VALID_COLUMNS = 6
 
@@ -23,7 +24,8 @@ def process_batch_logs(bucket_name, batch_log_file_name):
     print('headers: %s' % headers)
     for batch_log in batch_logs:
         if len(batch_log) < 6 or len(batch_log) > 6:
-            log_error("Error: InvalidRow. Total Missing/Extra Fields : " + abs(len(line) - TOTAL_VALID_COLUMNS))
+            log_error("Error: InvalidRow. Total Missing/Extra Fields : "
+                      + str(abs(len(batch_log) - TOTAL_VALID_COLUMNS)))
         else:
             if validate(batch_log):
                 print(batch_log)
@@ -34,7 +36,12 @@ def process_batch_logs(bucket_name, batch_log_file_name):
 
 
 def validate(batch_log):
-    if validate_batch_reference(batch_reference=batch_log[0]):
+    if validate_batch_reference(batch_reference=batch_log[0]) \
+            and validate_start(start=batch_log[1]) \
+            and validate_end(end=batch_log[2]) \
+            and validate_records(records=batch_log[3]) \
+            and validate_pass(batch_pass=batch_log[4]) \
+            and validate_message(message=batch_log[5]):
         return True
 
     return False
@@ -42,10 +49,61 @@ def validate(batch_log):
 
 def validate_batch_reference(batch_reference):
     if not batch_reference.isalnum():
-        log_error("Invalid Batch Reference : Batch Reference must be alphanumeric.")
+        log_error("Invalid Batch Reference value : Batch Reference must be alphanumeric.")
         return False
     if not len(batch_reference) == 20:
-        log_error("Invalid Batch Reference : Batch Reference length must be 20.")
+        log_error("Invalid Batch Reference value : Batch Reference length must be 20.")
+        return False
+
+    return True
+
+
+def validate_records(records):
+    if not records.isnumeric():
+        log_error("Invalid Records value: Records must be numeric.")
+        return False
+
+    return True
+
+
+def validate_pass(batch_pass):
+    batch_pass = str(batch_pass).lower()
+    if batch_pass != "true" and batch_pass != "false":
+        log_error("Invalid Records value: " + batch_pass + " : Pass must be correct boolean values.")
+        return False
+
+    return True
+
+
+def validate_message(message):
+    try:
+        message.encode(encoding='utf-8').decode('ascii')
+    except UnicodeDecodeError:
+        log_error("Invalid message value : " + message + " : is not valid message")
+        return False
+    else:
+        return True
+
+
+def validate_start(start):
+    try:
+        if start != datetime.strptime(start, "%Y-%m-%dT%H:%M:%S").strftime("%Y-%m-%dT%H:%M:%S"):
+            log_error("Invalid start datetime value : " + start + " : Format Error")
+            return False
+    except ValueError:
+        log_error("Invalid start datetime value : " + start + " : Parse Error")
+        return False
+
+    return True
+
+
+def validate_end(end):
+    try:
+        if end != datetime.strptime(end, "%Y-%m-%dT%H:%M:%S").strftime("%Y-%m-%dT%H:%M:%S"):
+            log_error("Invalid end datetime value :" + end + " : Format Error")
+            return False
+    except ValueError:
+        log_error("Invalid end datetime value : " + end + " : Parse Error")
         return False
 
     return True

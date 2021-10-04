@@ -10,5 +10,5 @@ def handler(event, context):
     process_batch_logs(bucket_name, key)
     return {
         'statusCode': 200,
-        'body': json.dumps('Hello from Lambda!')
+        'body': json.dumps('Successfully Processed Batch Logs.')
     }

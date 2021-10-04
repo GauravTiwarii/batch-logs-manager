@@ -40,7 +40,7 @@ Resources:
       Code:
         S3Bucket: lambda-zips-2021
         S3Key: BatchLogManager
-        S3ObjectVersion: qr4yQceBIasvjhMuGI1hXelUjRJklcS3
+        S3ObjectVersion: MYdsPTC0mdr2ZEU0D5y6jSFqwkmiE0UH
 
   LambdaExecutionRole:
     Type: AWS::IAM::Role
