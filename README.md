@@ -23,3 +23,9 @@ To deploy/update Stack, use the following command:
 
 
 _Note: Logs will be available under LogGroup "/aws/lambda/BatchLogManager" on CloudWatch_
+
+[Please use "main" branch for working executables, if TODOs are not completed]
+TODO:
+ 1. Integration of sqlite [Did we need it in-memory on lambda ? as even if we store it on "/tmp", that only gives us a valid scenario for read-only requirements and we have write as feature requirement here]
+ 2. Addition of more tests.
+
